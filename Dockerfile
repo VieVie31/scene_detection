@@ -1,41 +1,58 @@
-FROM debian:jessie
+FROM python:3.5
+MAINTAINER Josip Janzic <josip.janzic@gmail.com>
 
-RUN sudo apt-get update
-RUN sudo apt-get -y install build-essential cmake git pkg-config
-RUN sudo apt-get -y install libjpeg8-dev libtiff4-dev libjasper-dev libpng12-dev
-RUN apt-get -y install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
-RUN apt-get -y install libgtk2.0-dev
-RUN apt-get -y install libatlas-base-dev gfortran
-RUN apt-get -y install python3-pip
-RUN apt-get -y install python3.4-dev
-RUN pip3 install numpy
+RUN apt-get update && \
+        apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        unzip \
+        yasm \
+        pkg-config \
+        libswscale-dev \
+        libtbb2 \
+        libtbb-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libjasper-dev \
+        libavformat-dev \
+        libpq-dev
 
-RUN cd ~
-RUN git clone https://github.com/Itseez/opencv.git
-RUN cd opencv
-RUN git checkout 3.1.0
+RUN pip install numpy
 
-RUN cd ~
-RUN git clone https://github.com/Itseez/opencv_contrib.git
-RUN cd opencv_contrib
-RUN git checkout 3.1.0
+WORKDIR /
+RUN wget https://github.com/Itseez/opencv/archive/3.0.0.zip \
+&& unzip 3.0.0.zip \
+&& mkdir /opencv-3.0.0/cmake_binary \
+&& cd /opencv-3.0.0/cmake_binary \
+&& cmake -DBUILD_TIFF=ON \
+  -DBUILD_opencv_java=OFF \
+  -DWITH_CUDA=OFF \
+  -DENABLE_AVX=ON \
+  -DWITH_OPENGL=ON \
+  -DWITH_OPENCL=ON \
+  -DWITH_IPP=ON \
+  -DWITH_TBB=ON \
+  -DWITH_EIGEN=ON \
+  -DWITH_V4L=ON \
+  -DBUILD_TESTS=OFF \
+  -DBUILD_PERF_TESTS=OFF \
+  -DCMAKE_BUILD_TYPE=RELEASE \
+  -DCMAKE_INSTALL_PREFIX=$(python3.5 -c "import sys; print(sys.prefix)") \
+  -DPYTHON_EXECUTABLE=$(which python3.5) \
+  -DPYTHON_INCLUDE_DIR=$(python3.5 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
+  -DPYTHON_PACKAGES_PATH=$(python3.5 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") .. \
+&& make install \
+&& rm /3.0.0.zip \
+&& rm -r /opencv-3.0.0
 
-RUN cd ~/opencv
-RUN mkdir build
-RUN cd build
-RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
-    -D CMAKE_INSTALL_PREFIX=/usr/local \
-    -D INSTALL_C_EXAMPLES=ON \
-    -D INSTALL_PYTHON_EXAMPLES=ON \
-    -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
-    -D BUILD_EXAMPLES=ON ..
-
-RUN make -j4
-RUN make install
-RUN ldconfig
+RUN pip install flake8 pep8 --upgrade
 
 ADD . /src/
 WORKDIR /src/
-
+RUN echo 'Before'
 RUN python test.py
+RUN echo 'Before2'
 
