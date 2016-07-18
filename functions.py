@@ -17,7 +17,7 @@ def hamming(a, b):
     """
     a = bin(a)[2:][::-1]
     b = bin(b)[2:][::-1]
-    it = itertools.izip_longest(a, b, fillvalue='0')
+    it = itertools.zip_longest(a, b, fillvalue='0')
     return sum([va != vb for (va, vb) in it])
 
 
@@ -36,7 +36,7 @@ def phash64(img):
     mean = cv2.mean(resized)[0]
     boolean_matrix = resized > mean
     hash_lst = boolean_matrix.reshape((1, 64))[0]
-    hash_lst = map(int, hash_lst)
+    hash_lst = list(map(int, hash_lst))
     im_hash = 0
     for v in hash_lst:
         im_hash  = (im_hash << 1) | v
@@ -64,6 +64,6 @@ def variance(hist):
     :return: the variance of the histogram
     :rtype: float
     """
-    vl = hist.values()
+    vl = list(hist.values())
     m = sum(vl) / float(len(vl))
     return sum([(m - v)**2 for v in vl]) / float(len(vl))

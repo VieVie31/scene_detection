@@ -1,12 +1,13 @@
 from functions import *
+from scipy.optimize import curve_fit
 
-print "loading the video..."
+print("loading the video...")
 cap = cv2.VideoCapture("video_test.mp4")
 while not cap.isOpened():
     cap = cv2.VideoCapture("video_test.mp4")
 
 
-print "computing hashes..."
+print("computing hashes...")
 L = []
 pos_frame = cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES)
 while True:
@@ -24,7 +25,7 @@ while True:
         break
 
 
-print "computing inter frames difference..."
+print("computing inter frames difference...")
 LL = [hamming(L[i - 1], L[i]) for i in range(1, len(L))]
 
 d = histogram(LL)
@@ -37,3 +38,13 @@ plt.show()
 #display the repartition of inter frames distance
 plt.hist(LL, bins=max(d.keys()))
 plt.show()
+
+def func(x, a, b, c):
+    return a * np.exp(-b * x) + c
+
+nb_bins = max(d.keys())
+h, _, _ = plt.hist(LL, bins=nb_bins)
+
+popt, pcov = curve_fit(func, np.array(list(range(1, nb_bins + 1))), h)
+
+
