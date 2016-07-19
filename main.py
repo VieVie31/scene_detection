@@ -9,21 +9,16 @@ while not cap.isOpened():
 
 print("computing hashes...")
 L = []
-pos_frame = cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES)
-while True:
-    flag, frame = cap.read()
-    if flag: # The frame is ready and already captured
-        pos_frame = cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES)
-        L.append(phash64(frame))
-    else:
-        # The next frame is not ready, so we try to read it again
-        cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, pos_frame-1)
 
-    if cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES) == cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT):
-        # If the number of captured frames is equal to the total number of frames,
-        # we stop
-        break
+while (cap.isOpened()):
+    ret, frame = cap.read()
+    gray = cv2cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    L.append(phash64(gray))
+    print(phash64(gray))
 
+cap.release()
+
+exit()
 
 print("computing inter frames difference...")
 LL = [hamming(L[i - 1], L[i]) for i in range(1, len(L))]
