@@ -52,7 +52,5 @@ RUN pip install flake8 pep8 --upgrade
 
 ADD . /src/
 WORKDIR /src/
-RUN echo 'Before'
-RUN python test.py
-RUN echo 'Before2'
 
+CMD ["python", "test.py"]
