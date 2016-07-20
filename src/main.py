@@ -3,7 +3,7 @@ from scipy.optimize import curve_fit
 from os.path import abspath
 from tqdm import tqdm
 
-VIDEO_PATH = abspath("video_test.mp4")
+VIDEO_PATH = abspath("videos/video_test.mp4")
 print("[INIT] Loading video at", VIDEO_PATH)
 
 cap = cv2.VideoCapture(VIDEO_PATH)

@@ -17,7 +17,8 @@ RUN apt-get update && \
         libtiff-dev \
         libjasper-dev \
         libavformat-dev \
-        libpq-dev
+        libpq-dev \
+        libfreetype6-dev
 
 RUN pip install --upgrade \
     numpy \
@@ -54,6 +55,6 @@ RUN wget https://github.com/Itseez/opencv/archive/3.0.0.zip \
 && rm /3.0.0.zip \
 && rm -r /opencv-3.0.0
 
-ADD . /src/
+ADD ./src /src/
 WORKDIR /src/
 CMD ["python", "main.py"]
