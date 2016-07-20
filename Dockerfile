@@ -1,5 +1,4 @@
 FROM python:3.5
-MAINTAINER Josip Janzic <josip.janzic@gmail.com>
 
 RUN apt-get update && \
         apt-get install -y \
@@ -20,7 +19,14 @@ RUN apt-get update && \
         libavformat-dev \
         libpq-dev
 
-RUN pip install numpy
+RUN pip install --upgrade \
+    numpy \
+    scipy \
+    matplotlib \
+    flake8 \
+    pep8 \
+    tqdm
+
 
 WORKDIR /
 RUN wget https://github.com/Itseez/opencv/archive/3.0.0.zip \
@@ -48,8 +54,6 @@ RUN wget https://github.com/Itseez/opencv/archive/3.0.0.zip \
 && rm /3.0.0.zip \
 && rm -r /opencv-3.0.0
 
-RUN pip install scipy matplotlib flake8 pep8 --upgrade
-
 ADD . /src/
 WORKDIR /src/
-CMD ["python", "test.py"]
+CMD ["python", "main.py"]
