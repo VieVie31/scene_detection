@@ -48,9 +48,8 @@ RUN wget https://github.com/Itseez/opencv/archive/3.0.0.zip \
 && rm /3.0.0.zip \
 && rm -r /opencv-3.0.0
 
-RUN pip install flake8 pep8 --upgrade
+RUN pip install scipy matplotlib flake8 pep8 --upgrade
 
 ADD . /src/
 WORKDIR /src/
-
 CMD ["python", "test.py"]
