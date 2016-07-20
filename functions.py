@@ -1,14 +1,17 @@
 import cv2
 import itertools
 import numpy as np
-import matplotlib.pyplot as plt
+import warnings;
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore");
+    import matplotlib.pyplot as plt
 
 def hamming(a, b):
     """Compute the hamming distance between 2 int.
 
     :param a: a 64 bits integer
     :param b: a 64 bits integer
-    
+
     :type a: int
     :type b: int
 
@@ -54,7 +57,7 @@ def histogram(vector):
     """
     return {k: vector.count(k) for k in set(vector)}
 
-def variance(hist):
+def variance(hist:dict):
     """Compute the variance of an histogram.
 
     :param hist: the histogram
