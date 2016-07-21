@@ -1,4 +1,4 @@
-FROM kavolorn/opencv
+FROM python:3.5
 
 
 RUN echo "deb http://httpredir.debian.org/debian jessie-backports main" > \
@@ -23,20 +23,23 @@ RUN echo "deb http://httpredir.debian.org/debian jessie-backports main" > \
         libavformat-dev \
         libpq-dev \
         libfreetype6-dev \
-        ffmpeg \
-        libopencv-dev \
-        python3-matplotlib \
-        python3-numpy \
-        python3-scipy \
-        python3-pip \
-        && \
-        rm -rf /var/cache/apt/*
+        ffmpeg
 
 
-RUN pip3 install --upgrade \
-    flake8 \
-    pep8 \
-    tqdm
+RUN apt-get clean && \
+    apt-get install -y \
+    python3-matplotlib \
+    python3-numpy \
+    python3-scipy \
+    python3-pip \
+    && \
+    rm -rf /var/cache/apt/*
+
+RUN pip3 install --upgrade --no-cache-dir \
+        sk-video \
+        flake8 \
+        pep8 \
+        tqdm
 
 WORKDIR /src/
 CMD bash main.sh

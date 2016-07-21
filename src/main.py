@@ -1,34 +1,26 @@
-from functions import *
 from scipy.optimize import curve_fit
 from os.path import abspath
 from tqdm import tqdm
 from sys import argv
+import skvideo.io
 
 if __name__ == '__main__':
     # Temporary arg parsing
     for source in argv[1:]:
         print('Hashing', source)
         VIDEO_PATH = abspath(source)
-        print("[INIT] Loading video at", VIDEO_PATH)
-
-        cap = cv2.VideoCapture(VIDEO_PATH)
-        while not cap.isOpened():
-            cap = cv2.VideoCapture(VIDEO_PATH)
-
-        VIDEO_FRAMES_COUNT = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap = skvideo.io.vreader(VIDEO_PATH)
+#        VIDEO_FRAMES_COUNT = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         print("computing hashes...")
         L = []
 
-        with tqdm(total=VIDEO_FRAMES_COUNT) as pbar:
-            while (cap.isOpened()):
-                ret, frame = cap.read(0) # 0 flag for an already greyscaled image
-                # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                phash = phash64(frame)
-                L.append(phash)
+        with tqdm() as pbar:
+            for frame in cap:
+                # phash = phash64(frame)
+                # L.append(phash)
                 pbar.update()
 
-        cap.release()
         # exit()
         #
         # print("computing inter frames difference...")
