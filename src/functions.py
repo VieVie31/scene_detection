@@ -45,6 +45,21 @@ def phash64(img):
         im_hash  = (im_hash << 1) | v
     return im_hash
 
+def phash1(img):
+    """Return the hash of the image as a list of bits 
+    always ordered in the same order.
+
+    :param img: the binarized image
+
+    :type img: numpy.ndarray
+
+    :return: the perceptual hash of img in a vector
+    <!> the length of the hash returned depend of the size of image !!
+    :ntype: np.array
+    """
+    return ((img > 0) * 1).reshape((1, img.shape[0] * img.shape[1]))[0]
+
+
 def histogram(vector):
     """Compute the histogram of a vector.
 
