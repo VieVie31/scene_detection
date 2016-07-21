@@ -10,4 +10,4 @@ done
 
 echo "Running hasher"
 cd ..
-python3 main.py videos/encoded_*
+python3 -u main.py videos/encoded_*
