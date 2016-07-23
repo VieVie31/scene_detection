@@ -11,15 +11,17 @@ if __name__ == '__main__':
         print('Hashing', source)
         VIDEO_PATH = abspath(source)
         cap = skvideo.io.vreader(VIDEO_PATH)
-#        VIDEO_FRAMES_COUNT = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        infos = skvideo.io.vread(VIDEO_PATH, as_grey=True)
 
         print("computing hashes...")
         L = []
 
-        with tqdm() as pbar:
+        with tqdm(total=len(infos)) as pbar:
             for frame in cap:
                 phash = dhash(frame)
-                print(phash)
+                #print(phash)
                 L.append(phash)
                 pbar.update()
+
+        print(len(L))
 
