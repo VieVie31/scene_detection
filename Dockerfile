@@ -39,7 +39,9 @@ RUN pip3 install --upgrade --no-cache-dir \
         sk-video \
         flake8 \
         pep8 \
-        tqdm
+        tqdm \
+        matplotlib \
+        scikit-image
 
 WORKDIR /src/
 CMD bash main.sh

@@ -1,10 +1,9 @@
-import cv2
+#import cv2
 import itertools
 import numpy as np
-import warnings;
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore");
-    import matplotlib.pyplot as plt
+
+from skimage.color import rgb2grey
+from skimage.transform import resize
 
 def hamming(a, b):
     """Compute the hamming distance between 2 int.
@@ -23,8 +22,7 @@ def hamming(a, b):
     it = itertools.zip_longest(a, b, fillvalue='0')
     return sum([va != vb for (va, vb) in it])
 
-
-def phash64(img):
+def phash64(img): #need opencv...
     """Compute a perceptual hash of an image.
 
     :param img: a rgb image to be hashed
@@ -59,6 +57,26 @@ def phash1(img):
     """
     return ((img > 0) * 1).reshape((1, img.shape[0] * img.shape[1]))[0]
 
+def dhash(img):
+    """Compute a perceptual has of an image.
+
+    Algo explained here : 
+    https://blog.bearstech.com/2014/07/numpy-par-lexemple-une-implementation-de-dhash.html
+
+    :param img: an image
+
+    :type img: numpy.ndarray
+
+    :return: a perceptual hash of img coded on 64 bits
+    :rtype: int
+    """
+    TWOS = np.array([2 ** n for n in range(7, -1, -1)])
+    BIGS = np.array([256 ** n for n in range(7, -1, -1)], dtype=np.uint64)
+    img = rgb2grey(resize(img, (9, 8)))
+    h = np.array([0] * 8, dtype=np.uint8)
+    for i in range(8):
+        h[i] = TWOS[img[i] > img[i + 1]].sum()
+    return (BIGS * h).sum()
 
 def histogram(vector):
     """Compute the histogram of a vector.
@@ -85,3 +103,4 @@ def variance(hist:dict):
     vl = list(hist.values())
     m = sum(vl) / float(len(vl))
     return sum([(m - v)**2 for v in vl]) / float(len(vl))
+
