@@ -44,7 +44,7 @@ def phash64(img): #need opencv...
     return im_hash
 
 def phash1(img):
-    """Return the hash of the image as a list of bits 
+    """Return the hash of the image as a list of bits
     always ordered in the same order.
 
     :param img: the binarized image
@@ -60,7 +60,7 @@ def phash1(img):
 def dhash(img):
     """Compute a perceptual has of an image.
 
-    Algo explained here : 
+    Algo explained here :
     https://blog.bearstech.com/2014/07/numpy-par-lexemple-une-implementation-de-dhash.html
 
     :param img: an image
@@ -77,6 +77,17 @@ def dhash(img):
     for i in range(8):
         h[i] = TWOS[img[i] > img[i + 1]].sum()
     return (BIGS * h).sum()
+
+def dhash_freesize(img):
+    bits = []
+    for row in range(img.shape[0]):
+        for col in range(img.shape[1]-1):
+            l = pack('BBB', *img[row][col])
+            r = pack('BBB', *img[row][col+1])
+            bits.append('1') if l > r else bits.append('0')
+
+    dhash = int(''.join(bits), 2)
+    return dhash
 
 def histogram(vector):
     """Compute the histogram of a vector.
@@ -103,4 +114,3 @@ def variance(hist:dict):
     vl = list(hist.values())
     m = sum(vl) / float(len(vl))
     return sum([(m - v)**2 for v in vl]) / float(len(vl))
-
