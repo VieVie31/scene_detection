@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
         # Hashing
         for _, frame in zip(trange(VIDEO_FRAMES_COUNT, leave=False), cap):
-            hash_img = int(dhash_freesize(frame))
+            hash_img = int(phash64(frame))
             if len(L):
                 diffs.append(hamming(hash_img, L[-1]))
             L.append(hash_img)
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
         #searching the longuest repeated sub array
         #<!> this function take a quadratic time ... so can crash computer ?? maybe...
-        potentiel_generic = longuest_repeated_string(L)
+        potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 3)
         print('')
         print("longuest sub repeating subsequence : ")
         print(potentiel_generic)

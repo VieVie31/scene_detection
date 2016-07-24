@@ -6,28 +6,35 @@ from struct import pack
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
-def longuest_common_prefix(s, t):
+def longuest_common_prefix(s, t, compare_function=None):
     """Return the longest common prefix of s and t.
     
     :param s: a string
     :param t: a string
+    :param compare_function: a function for comparing two items
 
     :type s: str
     :type t: str
+    :type compare_function: function (musta take 2 args)
 
     :return: the longest common prefix of s and t
     :rtype: str
     """
     n = min(len(s), len(t))
     for i in range(n):
-        if s[i] != t[i]:
-            return s[:i]
+        if compare_function:
+            if not compare_function(s[i], t[i]):
+                return s[:i]
+        else:
+            if s[i] != t[i]:
+                return s[:i]
     return s[:]
 
-def longuest_repeated_string(s):
+def longuest_repeated_string(s, compare_function=None):
     """Return the longest repeated string in s.
 
     :param s: the string to find the longuest repeated subtring
+    :param compare_function: a function for comparing two items 
 
     :type s: str
 
@@ -47,7 +54,7 @@ def longuest_repeated_string(s):
     #adjacent sorted suffixes
     lrs = ""
     for i in range(n - 1):
-        x = longuest_common_prefix(suffixes[i], suffixes[i+1])
+        x = longuest_common_prefix(suffixes[i], suffixes[i+1], compare_function)
         if len(x) > len(lrs):
             lrs = x
 
