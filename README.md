@@ -27,6 +27,23 @@ And if now I draw the reparition of the distances as an histogram, this is what 
 
 ![inter frames distance reparition](img/inter_frames_distance_reparition.png)
 
+## Perceptual Hashing
+----------------------
+
+I've tryied on a same video 3 differents perceptual hashes implemented in the file function : phash64, dhash, dhash_freesize.
+
+That's how the distance inter-frames looks, for each.
+
+Using dhash : 
+![dhash](img/dhash.png)
+
+
+Using dhash_freesize : 
+![dhash_freesize](img/dhash_freesize.png)
+
+Using phash64: 
+![phash64](img/phash64.png)
+
 ## Troubleshooting
 
 `apt-get` sometimes fail
