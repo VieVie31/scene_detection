@@ -23,7 +23,7 @@ def hamming(a, b):
     it = itertools.zip_longest(a, b, fillvalue='0')
     return sum([va != vb for (va, vb) in it])
 
-def phash64(img): #need opencv...
+def phash64(img):
     """Compute a perceptual hash of an image.
 
     :param img: a rgb image to be hashed
