@@ -1,11 +1,12 @@
-from functions import dhash, hamming, dhash_freesize
+from sys import argv
+from pprint import pformat
 from os.path import abspath
 from tqdm import tqdm, trange
-from sys import argv
-from collections import defaultdict
-from pprint import pformat
 from itertools import combinations
+from collections import Counter
 from skvideo.io import ffprobe, vreader
+from functions import phash64, dhash, dhash_freesize, hamming
+
 import os
 import warnings
 # Remove matplotlib warning because of fc-cache building
@@ -29,19 +30,16 @@ if __name__ == '__main__':
         cap = vreader(VIDEO_PATH)
 
         L = []
-        diffs = []
+        diffs = [0]
 
         # Hashing
-        count_tab = defaultdict(lambda: 0, {})
         for _, frame in zip(trange(VIDEO_FRAMES_COUNT, leave=False), cap):
             hash_img = int(dhash_freesize(frame))
-            count_tab[hash_img] += 1
             if len(L):
-                diffs += [hamming(hash_img, L[-1])]
-            else:
-                diffs += [0]
+                diffs.append(hamming(hash_img, L[-1]))
             L.append(hash_img)
 
+        count_tab = Counter(L)
         collisions = sum(count_tab.values()) - len(count_tab)
         assert len(L) == VIDEO_FRAMES_COUNT
         stats += [{
