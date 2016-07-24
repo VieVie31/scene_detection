@@ -8,3 +8,5 @@ fi
 
 #run with videos in the volume...
 docker run -v $(pwd)/src:/src -v $(pwd)/videos:/videos scd
+
+#rm -fr ./src/__pycache__

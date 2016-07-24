@@ -33,9 +33,8 @@ def phash64(img): #need opencv...
     :return: a perceptrual hash of img coded on 64 bits
     :rtype: int
     """
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    resized = cv2.resize(gray, (8, 8))
-    mean = cv2.mean(resized)[0]
+    resized = rgb2grey(resize(img, (8, 8)))
+    mean = resized.mean()
     boolean_matrix = resized > mean
     hash_lst = boolean_matrix.reshape((1, 64))[0]
     hash_lst = list(map(int, hash_lst))
