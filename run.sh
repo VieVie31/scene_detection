@@ -7,4 +7,4 @@ if [ "$1" != "cache" ]; then
 fi
 
 #run with videos in the volume...
-docker run -v $(pwd)/src:/src -v $(pwd)/videos:/src/videos scd 
+docker run -v $(pwd)/src:/src -v $(pwd)/videos:/videos scd

@@ -199,3 +199,7 @@ flycheck_*.el
 
 *.mp4
 *.avi
+
+# Exported statistics from matplotlib
+
+*.png
