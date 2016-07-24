@@ -6,6 +6,53 @@ from struct import pack
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
+def longuest_common_prefix(s, t):
+    """Return the longest common prefix of s and t.
+    
+    :param s: a string
+    :param t: a string
+
+    :type s: str
+    :type t: str
+
+    :return: the longest common prefix of s and t
+    :rtype: str
+    """
+    n = min(len(s), len(t))
+    for i in range(n):
+        if s[i] != t[i]:
+            return s[:i]
+    return s[:]
+
+def longuest_repeated_string(s):
+    """Return the longest repeated string in s.
+
+    :param s: the string to find the longuest repeated subtring
+
+    :type s: str
+
+    :return: the longest repeated string in s
+    :rtype: str
+    """
+    #form the N suffixes
+    n = len(s)
+    suffixes = []
+    for i in range(n):
+        suffixes.append(s[i:])
+
+    #sort them
+    suffixes.sort()
+
+    #find longest repeated substring by comparing
+    #adjacent sorted suffixes
+    lrs = ""
+    for i in range(n - 1):
+        x = longuest_common_prefix(suffixes[i], suffixes[i+1])
+        if len(x) > len(lrs):
+            lrs = x
+
+    return lrs
+
 def hamming(a, b):
     """Compute the hamming distance between 2 int.
 

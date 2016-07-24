@@ -5,7 +5,7 @@ from tqdm import tqdm, trange
 from itertools import combinations
 from collections import Counter
 from skvideo.io import ffprobe, vreader
-from functions import phash64, dhash, dhash_freesize, hamming
+from functions import phash64, dhash, dhash_freesize, hamming, longuest_repeated_string
 
 import os
 import warnings
@@ -56,4 +56,13 @@ if __name__ == '__main__':
         plt.plot(L)
         plotfile = '/videos/%s.png' % source.split('/')[-1]
         plt.savefig(plotfile)
+
+        #searching the longuest repeated sub array
+        #<!> this function take a quadratic time ... so can crash computer ?? maybe...
+        potentiel_generic = longuest_repeated_string(L)
+        print('')
+        print("longuest sub repeating subsequence : ")
+        print(potentiel_generic)
+        print((len(potentiel_generic)))
+        print('')
     tqdm.write(pformat(stats, indent=2, depth=2))
