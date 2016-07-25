@@ -6,6 +6,31 @@ from struct import pack
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
+def get_indexes(lst, sub_lst, compare_function=None):
+    """Return the indexes of a sub list in a list.
+
+    :param lst: the list to search in
+    :param sub_lst: the list to match
+    :param compare_function: the comparaison function used
+
+    :type lst: list
+    :type sub_lst: list
+    :type compare_function: function, takes 2 list as argument
+
+    :return: the list of indexes of sub_lst in lst.
+    :rtype: list of int
+    """
+    indexes = []
+    ln = len(sub_lst)
+    for i in range(len(lst)):
+        if compare_function:
+            if compare_function(lst[i:i + ln], sub_lst):
+                indexes.append(i)
+        else:
+            if lst[i:i + ln] == sub_lst:
+                indexes.append(i)
+    return indexes
+
 def longuest_common_prefix(s, t, compare_function=None):
     """Return the longest common prefix of s and t.
     
@@ -76,6 +101,25 @@ def hamming(a, b):
     b = bin(b)[2:][::-1]
     it = itertools.zip_longest(a, b, fillvalue='0')
     return sum([va != vb for (va, vb) in it])
+
+def hamming_match(L1, L2, tolerence=2):
+    """Tell us is 2 list of ints are equals with an error tolerance
+    using the hamming ditance between 2 ints.
+
+    :param L1: a list to compare
+    :param L2: the second list to compare
+    :param tolerence: the distance accepted between 2 ints
+
+    :type L1: list of int
+    :type L2: list of int
+    :type tolerence: int
+    """
+    if len(L1) != len(L2):
+        return False
+    for (u, v) in zip(L1, L2):
+        if hamming(u, v) > tolerence:
+            return False
+    return True
 
 def phash64(img):
     """Compute a perceptual hash of an image.

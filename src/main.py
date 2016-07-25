@@ -5,7 +5,7 @@ from tqdm import tqdm, trange
 from itertools import combinations
 from collections import Counter
 from skvideo.io import ffprobe, vreader
-from functions import phash64, dhash, dhash_freesize, hamming, longuest_repeated_string
+from functions import phash64, dhash, dhash_freesize, hamming, longuest_repeated_string, get_indexes, hamming_match
 
 import os
 import warnings
@@ -62,10 +62,12 @@ if __name__ == '__main__':
 
         #searching the longuest repeated sub array
         #<!> this function take a quadratic time ... so can crash computer ?? maybe...
-        potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 3)
+        potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 1)
         print('')
         print("longuest sub repeating subsequence : ")
         print(potentiel_generic)
         print((len(potentiel_generic)))
+        print('')
+        print(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5)))
         print('')
     tqdm.write(pformat(stats, indent=2, depth=2))
