@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
         # Creating output graph
         plt.plot(L)
-        plotfile = '/videos/%s.png' % source.split('/')[-1]
+        plotfile = '/cache/stats/%s.png' % source.split('/')[-1]
         plt.savefig(plotfile)
         plt.clf()
         plt.cla()
@@ -63,11 +63,7 @@ if __name__ == '__main__':
         #searching the longuest repeated sub array
         #<!> this function take a quadratic time ... so can crash computer ?? maybe...
         potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 1)
-        print('')
-        print("longuest sub repeating subsequence : ")
-        print(potentiel_generic)
-        print((len(potentiel_generic)))
-        print('')
-        print(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5)))
-        print('')
+        tqdm.write(pformat(potentiel_generic, indent=2))
+        tqdm.write(str(len(potentiel_generic)))
+        tqdm.write(str(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5))))
     tqdm.write(pformat(stats, indent=2, depth=2))

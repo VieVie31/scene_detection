@@ -4,20 +4,19 @@
 export PREFIX=out_
 SOURCE_DIRECTORY=/videos
 
-# Set to /videos to store ffmpeg encoded videos on fs or something else
+# Set to /cache to store ffmpeg encoded videos on fs or something else
 # for temp folder usage
-DESTINATION_DIRECTORY=/videos
-
+if [ $CACHE == '1' ];
+then
+  CACHE_DIRECTORY=/cache
+else
+  CACHE_DIRECTORY=/tmp
+fi
 
 echo "Converting videos"
-# creating tmp encoded datas destination folder
-# /!\ Removed when container exits
-mkdir -p $DESTINATION_DIRECTORY
+mkdir -p /cache/stats
 
 cd $SOURCE_DIRECTORY
-
-# remove old png exports, ensuring analysis won't try to use them as videos
-rm -vf $PREFIX*.png
 
 current=1
 # Ignore previous analysis traces in total
@@ -25,26 +24,32 @@ current=1
 
 for f in *;
 do
+  # OBSOLETE
   # Does not reencode cached output from a previous analysis
-  if [[ $f == $PREFIX* ]];
-  then
-    continue
-  fi
+  # if [[ $f == $PREFIX* ]];
+  # then
+    # continue
+  # fi
 
+  echo $FPS
   echo "[$current / $total] $f"
   # increment file counter
   ((current++))
   ffmpeg  -loglevel warning \
           -stats \
           -i "$f" \
-          -s 8x8 \
+          -s $RESOLUTION \
           -vf hue=s=0 \
           -an \
-          -r 1 \
-          "$DESTINATION_DIRECTORY/$PREFIX$f"
-
+          -r $FPS \
+          "$CACHE_DIRECTORY/$PREFIX$f"
+  if [ ! -e "$CACHE_DIRECTORY/$PREFIX$f" ];
+  then
+    echo "Encoding error : File not found"
+    exit 1 # Exit if encoding fail
+  fi
 done
 cd /
 
 echo "Running hasher"
-python3.5 -u /src/main.py $DESTINATION_DIRECTORY/$PREFIX*
+python3.5 -u /src/main.py $CACHE_DIRECTORY/$PREFIX*
