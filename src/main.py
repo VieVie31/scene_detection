@@ -56,6 +56,9 @@ if __name__ == '__main__':
         plt.plot(L)
         plotfile = '/videos/%s.png' % source.split('/')[-1]
         plt.savefig(plotfile)
+        plt.clf()
+        plt.cla()
+        plt.close()
 
         #searching the longuest repeated sub array
         #<!> this function take a quadratic time ... so can crash computer ?? maybe...
