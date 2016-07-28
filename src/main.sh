@@ -31,7 +31,6 @@ do
     # continue
   # fi
 
-  echo $FPS
   echo "[$current / $total] $f"
   # increment file counter
   ((current++))
