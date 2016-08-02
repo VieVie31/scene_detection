@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 
 from struct import pack
+from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
@@ -186,6 +187,46 @@ def dhash_freesize(img):
 
     dhash = int(''.join(bits), 2)
     return dhash
+
+def int_to_bits_indexes(n):
+    """Return the list of bits indexes set to 1.
+
+    :param n: the int to convert
+
+    :type n: int
+
+    :return: a list of the indexes of bites sets to 1
+    :rtype: list
+    """
+    L = []
+    i = 0
+    while n:
+        if n % 2:
+            L.append(i)
+        n //= 2
+        i += 1
+    return L
+
+def get_hash_of_hashes(L):
+    """Return a compressed perceptual hash from
+    a list of perceptual hashes.
+
+    :param L: as list of hashes
+
+    :type L: list of int
+
+    :return: a compressed perceptual hash of a sequence
+    :rtype: int
+    """
+    L = reduce(lambda a, b: a + b, map(int_to_bits_indexes, L), [])
+    c = Counter(L)
+    out = 0
+    med = sum(c.values()) / (max(c) + 1.)
+    for k in c:
+        if c[k] >= med:
+            out += 2 ** k
+    return out
+
 
 def histogram(vector):
     """Compute the histogram of a vector.
