@@ -227,6 +227,26 @@ def get_hash_of_hashes(L):
             out += 2 ** k
     return out
 
+def sliding_window(L, slice_size, step=1, function=lambda v: v):
+    """Iterator, apply some function on slices of 1D list,
+    like a sliding window.
+
+    :param L: list to apply the function
+    :param slice_size: max size of the slice to apply the function
+    :param step: step for forwarding, (overlaping the windows)
+    :param function: the function to apply on the window
+
+    :type L: list
+    :type slice_size: int
+    :type step: int
+    :type function: function
+
+    :yield: what the function return
+    """
+    i = 0
+    while i < len(L):
+        yield function(L[i:i+slice_size])
+        i += step
 
 def histogram(vector):
     """Compute the histogram of a vector.
