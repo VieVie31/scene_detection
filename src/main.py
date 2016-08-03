@@ -5,7 +5,10 @@ from tqdm import tqdm, trange
 from itertools import combinations
 from collections import Counter
 from skvideo.io import ffprobe, vreader
-from functions import phash64, dhash, dhash_freesize, hamming, longuest_repeated_string, get_indexes, hamming_match
+from functions import phash64, dhash, dhash_freesize, \
+                      hamming, longuest_repeated_string, \
+                      get_indexes, hamming_match, \
+                      get_hash_of_hashes, sliding_window
 
 import os
 import warnings
@@ -60,10 +63,22 @@ if __name__ == '__main__':
         plt.cla()
         plt.close()
 
+        #trying some stuffs about sequence hashing
+        tqdm.write("sequence hashing...")
+        sequences = list(sliding_window(L, 10, 1, get_hash_of_hashes))
+        c = Counter(sequences)
+        tqdm.write(pformat(c, indent=2, depth=2))
+        
+
+        tqdm.write("searching a seq")
+        for i, hash_seq in enumerate(sequences):
+            if hash_seq == 1187963483472165888: #the hash seq to search
+                tqdm.write(str(i))
+
         #searching the longuest repeated sub array
         #<!> this function take a quadratic time ... so can crash computer ?? maybe...
-        potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 1)
-        tqdm.write(pformat(potentiel_generic, indent=2))
-        tqdm.write(str(len(potentiel_generic)))
-        tqdm.write(str(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5))))
+        #potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 1)
+        #tqdm.write(pformat(potentiel_generic, indent=2))
+        #tqdm.write(str(len(potentiel_generic)))
+        #tqdm.write(str(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5))))
     tqdm.write(pformat(stats, indent=2, depth=2))

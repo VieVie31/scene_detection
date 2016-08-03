@@ -3,6 +3,8 @@ import itertools
 import numpy as np
 
 from struct import pack
+from functools import reduce
+from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
@@ -186,6 +188,66 @@ def dhash_freesize(img):
 
     dhash = int(''.join(bits), 2)
     return dhash
+
+def int_to_bits_indexes(n):
+    """Return the list of bits indexes set to 1.
+
+    :param n: the int to convert
+
+    :type n: int
+
+    :return: a list of the indexes of bites sets to 1
+    :rtype: list
+    """
+    L = []
+    i = 0
+    while n:
+        if n % 2:
+            L.append(i)
+        n //= 2
+        i += 1
+    return L
+
+def get_hash_of_hashes(L):
+    """Return a compressed perceptual hash from
+    a list of perceptual hashes.
+
+    :param L: as list of hashes
+
+    :type L: list of int
+
+    :return: a compressed perceptual hash of a sequence
+    :rtype: int
+    """
+    L = reduce(lambda a, b: a + b, map(int_to_bits_indexes, L), [])
+    c = Counter(L)
+    out = 0
+    med = sum(c.values()) / (max(c) + 1.)
+    for k in c:
+        if c[k] >= med:
+            out += 2 ** k
+    return out
+
+def sliding_window(L, slice_size, step=1, function=lambda v: v):
+    """Iterator, apply some function on slices of 1D list,
+    like a sliding window.
+
+    :param L: list to apply the function
+    :param slice_size: max size of the slice to apply the function
+    :param step: step for forwarding, (overlaping the windows)
+    :param function: the function to apply on the window
+
+    :type L: list
+    :type slice_size: int
+    :type step: int
+    :type function: function
+
+    :yield: what the function return
+    """
+    i = 0
+    while i < len(L):
+        yield function(L[i:i+slice_size])
+        i += step
 
 def histogram(vector):
     """Compute the histogram of a vector.
