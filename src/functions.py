@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 
 from struct import pack
+from functools import reduce
 from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
