@@ -19,6 +19,12 @@ with warnings.catch_warnings():
 
 if __name__ == '__main__':
     stats = []
+
+    SLIDING_WINDOW  = int(os.environ['SLIDING_WINDOW'])
+    SEQUENCE_LENGTH = int(os.environ['SEQUENCE_LENGTH'])
+
+    print(os.environ)
+
     # Temporary arg parsing
     for _, source in zip(trange( \
                             len(argv) - 1, \
@@ -65,7 +71,7 @@ if __name__ == '__main__':
 
         #trying some stuffs about sequence hashing
         tqdm.write("sequence hashing...")
-        sequences = list(sliding_window(L, 10, 1, get_hash_of_hashes))
+        sequences = list(sliding_window(L, SEQUENCE_LENGTH, SLIDING_WINDOW, get_hash_of_hashes))
         c = Counter(sequences)
         tqdm.write(pformat(c, indent=2, depth=2))
         
