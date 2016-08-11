@@ -25,11 +25,10 @@ def fps_parser(v):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Shrink videos to delete openings.')
+    parser = argparse.ArgumentParser(prog="scd", description='Shrink videos to delete openings.')
     parser.add_argument('-f', '--fps', type=int, help='Number of frame per second analysed', default=5)
     parser.add_argument('-r', '--resolution', type=str, help='Set analysis resolution: widthxheight', default='8x8')
     parser.add_argument('-nc', '--no-cache', action='store_true', help='Disable application video encoding cache')
-    # TODO: Make cache recognize different encoding options
 
     args = parser.parse_args(argv[1:])
     print('Building container')

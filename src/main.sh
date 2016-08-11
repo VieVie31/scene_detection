@@ -1,5 +1,12 @@
 #! /bin/sh
 
+# create an id for the video to transform with specified paramters
+function make_id {
+  md5=$(md5sum $1)
+  out=$(echo ${md5}_${RESOLUTION}_${FPS})
+  echo $out 
+}
+
 # created files prefix
 export PREFIX=out_
 SOURCE_DIRECTORY=/videos
@@ -31,7 +38,9 @@ do
     # continue
   # fi
 
-  echo "[$current / $total] $f"
+  video_id=$(make_id $f)
+
+  echo "[$current / $total] $f $video_id"
   # increment file counter
   ((current++))
   ffmpeg  -loglevel warning \
@@ -41,8 +50,8 @@ do
           -vf hue=s=0 \
           -an \
           -r $FPS \
-          "$CACHE_DIRECTORY/$PREFIX$f"
-  if [ ! -e "$CACHE_DIRECTORY/$PREFIX$f" ];
+          "$CACHE_DIRECTORY/$video_id.mp4"
+  if [ ! -e "$CACHE_DIRECTORY/$video_id.mp4" ];
   then
     echo "Encoding error : File not found"
     exit 1 # Exit if encoding fail
@@ -51,4 +60,4 @@ done
 cd /
 
 echo "Running hasher"
-python3.5 -u /src/main.py $CACHE_DIRECTORY/$PREFIX*
+python3.5 -u /src/main.py $CACHE_DIRECTORY/*mp4
