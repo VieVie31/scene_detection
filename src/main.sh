@@ -2,7 +2,7 @@
 
 # create an id for the video to transform with specified paramters
 function make_id {
-  md5=$(md5sum $1)
+  md5=$(md5sum $1 | cut -d ' ' -f 1)
   out=$(echo ${md5}_${RESOLUTION}_${FPS})
   echo $out 
 }
