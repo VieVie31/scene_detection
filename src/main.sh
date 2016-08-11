@@ -20,8 +20,16 @@ else
   CACHE_DIRECTORY=/tmp
 fi
 
+# clear all the cached files
+if [ $CLEAR_CACHE == '1' ];
+then
+  echo "Clearing cached files"
+  rm -fr $CACHE_DIRECTORY/*
+  touch  $CACHE_DIRECTORY/.gitkeep
+fi
+
 echo "Converting videos"
-mkdir -p /cache/stats
+mkdir -p $CACHE_DIRECTORY/stats
 
 cd $SOURCE_DIRECTORY
 
@@ -60,4 +68,4 @@ done
 cd /
 
 echo "Running hasher"
-python3.5 -u /src/main.py $CACHE_DIRECTORY/*mp4
+python3.5 -u /src/main.py $CACHE_DIRECTORY/*.mp4
