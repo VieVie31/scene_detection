@@ -70,16 +70,16 @@ if __name__ == '__main__':
         plt.close()
 
         #trying some stuffs about sequence hashing
-        tqdm.write("sequence hashing...")
         sequences = list(sliding_window(L, SEQUENCE_LENGTH, SLIDING_WINDOW, get_hash_of_hashes))
         c = Counter(sequences)
-        tqdm.write(pformat(c, indent=2, depth=2))
-        
+        # tqdm.write(pformat(c, indent=2, depth=2))
 
-        tqdm.write("searching a seq")
-        for i, hash_seq in enumerate(sequences):
-            if hash_seq == 1187963483472165888: #the hash seq to search
-                tqdm.write(str(i))
+
+        best = c.most_common(1)[0][0]
+        tqdm.write('[matchs] %d [indexes] %s' % (
+            c.most_common(1)[0][1],
+            [x for x, s in enumerate(sequences) if s == best]
+        ))
 
         #searching the longuest repeated sub array
         #<!> this function take a quadratic time ... so can crash computer ?? maybe...

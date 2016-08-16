@@ -4,7 +4,7 @@
 function make_id {
   md5=$(md5sum $1 | cut -d ' ' -f 1)
   out=$(echo ${md5}_${RESOLUTION}_${FPS})
-  echo $out 
+  echo $out
 }
 
 # created files prefix
@@ -51,7 +51,9 @@ do
   echo "[$current / $total] $f $video_id"
   # increment file counter
   ((current++))
-  ffmpeg  -loglevel warning \
+  if [ ! -e "$CACHE_DIRECTORY/$video_id.mp4" ]
+  then
+    yes N | ffmpeg  -loglevel warning \
           -stats \
           -i "$f" \
           -s $RESOLUTION \
@@ -59,7 +61,8 @@ do
           -an \
           -r $FPS \
           "$CACHE_DIRECTORY/$video_id.mp4"
-  if [ ! -e "$CACHE_DIRECTORY/$video_id.mp4" ];
+  fi
+  if [ ! -e "$CACHE_DIRECTORY/$video_id.mp4" ]
   then
     echo "Encoding error : File not found"
     exit 1 # Exit if encoding fail

@@ -54,6 +54,7 @@ if __name__ == '__main__':
                         -e "RESOLUTION=%s" \
                         -e "SEQUENCE_LENGTH=%s" \
                         -e "SLIDING_WINDOW=%s" \
+                        -it \
                         scd' \
                         % (('0' if args.no_cache else '1'),
                            ('1' if args.clear_cache else '0'),
