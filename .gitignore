@@ -2,6 +2,7 @@
 *.pyc
 
 cache
+videos
 
 # Created by https://www.gitignore.io/api/macos,linux,python,vim,emacs
 
