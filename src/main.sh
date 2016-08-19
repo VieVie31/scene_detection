@@ -2,9 +2,8 @@
 
 # create an id for the video to transform with specified paramters
 function make_id {
-  md5=$(md5sum $1 | cut -d ' ' -f 1)
-  out=$(echo ${md5}_${RESOLUTION}_${FPS})
-  echo $out
+  fingerprint=$(echo -e $@ | base64)
+  echo -e "${fingerprint}_${RESOLUTION}_${FPS}"
 }
 
 # created files prefix
@@ -34,8 +33,12 @@ mkdir -p $CACHE_DIRECTORY/stats
 cd $SOURCE_DIRECTORY
 
 current=1
+encoded_videos=''
+
 # Ignore previous analysis traces in total
+rm $CACHE_DIRECTORY/indexes.txt
 ((total = $(ls $SOURCE_DIRECTORY | wc -l) - $(ls $PREFIX* 2>/dev/null | wc -l)))
+
 
 for f in *;
 do
@@ -47,10 +50,11 @@ do
   # fi
 
   video_id=$(make_id $f)
-
+  echo "$current;$f;$video_id" >> $CACHE_DIRECTORY/indexes.txt
   echo "[$current / $total] $f $video_id"
   # increment file counter
   ((current++))
+
   if [ ! -e "$CACHE_DIRECTORY/$video_id.mp4" ]
   then
     yes N | ffmpeg  -loglevel warning \
@@ -67,8 +71,31 @@ do
     echo "Encoding error : File not found"
     exit 1 # Exit if encoding fail
   fi
+  encoded_videos="$encoded_videos$video_id.mp4\n"
 done
-cd /
+
+
+# Concatenate all encoded videos
+cd $CACHE_DIRECTORY
+echo "Concatenate videos"
+#Creating ffmpeg input file for concatenation
+echo -e "${encoded_videos::-1}" | \
+  while read tab; do echo "file '$tab'"; done > list.txt
+
+# Encoding
+yes | ffmpeg \
+        -safe 0 \
+        -loglevel warning \
+        -stats \
+        -f concat \
+        -i list.txt \
+        -c copy \
+        -s $RESOLUTION \
+        -an \
+        -r $FPS \
+        /output.mp4
+
+# rm -f list.txt
 
 echo "Running hasher"
-python3.5 -u /src/main.py $CACHE_DIRECTORY/*.mp4
+python3.5 -u /src/main.py $CACHE_DIRECTORY/indexes.txt /output.mp4

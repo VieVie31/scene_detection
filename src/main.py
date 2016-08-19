@@ -1,15 +1,17 @@
-from sys import argv
+from sys import argv, exit
 from pprint import pformat
 from os.path import abspath
 from tqdm import tqdm, trange
 from itertools import combinations
 from collections import Counter
-from skvideo.io import ffprobe, vreader
 from functions import phash64, dhash, dhash_freesize, \
                       hamming, longuest_repeated_string, \
                       get_indexes, hamming_match, \
                       get_hash_of_hashes, sliding_window
-
+from skvideo.io import vreader, ffprobe
+from subprocess import call
+from time import sleep
+from base64 import b64decode
 import os
 import warnings
 # Remove matplotlib warning because of fc-cache building
@@ -17,25 +19,46 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import matplotlib.pyplot as plt
 
+def get_metdata(path: str):
+    a = ffprobe(path)['video']
+    # print('FFPROBE :', path, pformat(a))
+    return a
+
 if __name__ == '__main__':
     stats = []
 
     SLIDING_WINDOW  = int(os.environ['SLIDING_WINDOW'])
     SEQUENCE_LENGTH = int(os.environ['SEQUENCE_LENGTH'])
 
-    print(os.environ)
-
+    ORIGINAL_VIDEOS = []
+    # First argument is a path to original videos informations
+    with open(argv[1], 'r') as f:
+        for line in f:
+            idx, source, encoded = line.split(';')
+            ORIGINAL_VIDEOS += [{
+                "index": int(idx) - 1,
+                "source": source,
+                "encoded": encoded.replace('\n', '')
+            }]
+        ORIGINAL_VIDEOS = [(v['source'], v['encoded']) for v in sorted(ORIGINAL_VIDEOS, key=lambda x: x['index'])]
+        print(ORIGINAL_VIDEOS)
     # Temporary arg parsing
     for _, source in zip(trange( \
-                            len(argv) - 1, \
+                            len(argv) - 2, \
                             desc='Files', \
                             ), \
-                         argv[1:]):
+                         argv[2:]):
 
         # Loading source video
         VIDEO_PATH = abspath(source)
-        METADATA = ffprobe(source)['video']
+
+        if not os.access(VIDEO_PATH, os.R_OK):
+            print('Internal error, source file is not avaliable')
+            exit(1)
+        METADATA = get_metdata(source)
         VIDEO_FRAMES_COUNT = int(METADATA["@nb_frames"])
+        VIDEO_TIME_BASE = eval(METADATA["@codec_time_base"])
+        # VIDEO_FRAMES_COUNT = 100000
         cap = vreader(VIDEO_PATH)
 
         L = []
@@ -54,11 +77,12 @@ if __name__ == '__main__':
         stats += [{
             'source': VIDEO_PATH,
             'frames': VIDEO_FRAMES_COUNT,
+            'time_base': VIDEO_TIME_BASE,
             'collisions': collisions,
             'datas': {
                 'diffs': diffs,
                 'hashes': L
-            }
+            },
         }]
 
         # Creating output graph
@@ -76,9 +100,10 @@ if __name__ == '__main__':
 
 
         best = c.most_common(1)[0][0]
+        indexes = [x for x, s in enumerate(sequences) if s == best]
         tqdm.write('[matchs] %d [indexes] %s' % (
             c.most_common(1)[0][1],
-            [x for x, s in enumerate(sequences) if s == best]
+            indexes
         ))
 
         #searching the longuest repeated sub array
@@ -88,3 +113,35 @@ if __name__ == '__main__':
         #tqdm.write(str(len(potentiel_generic)))
         #tqdm.write(str(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5))))
     tqdm.write(pformat(stats, indent=2, depth=2))
+    tqdm.write(pformat(ORIGINAL_VIDEOS, indent=2, depth=2))
+    for stat in stats:
+        tqdm.write('Frames: %s %s %s' % (stat['frames'], 'TimeBase:', stat['time_base']))
+    start_frame = 0
+    idx = 0
+
+    for match in indexes:
+        found = False
+
+        for source, dest in ORIGINAL_VIDEOS[idx:]:
+            # destination video
+            time_base = eval(get_metdata(dest + ".mp4")["@codec_time_base"])
+            video_frames = int(get_metdata(dest + ".mp4")["@nb_frames"])
+
+            # print(start_frame, '+', video_frames, '>', match)
+            if start_frame + video_frames > match:
+                print('timeout 2 vlc --start-time=%s "videos/%s";' % (match - start_frame, source))
+                found = True
+                break
+            idx += 1
+            start_frame += video_frames
+
+        # If this assertion raise, we were not able to locate match in source videos
+        assert found is True
+
+
+
+    # tqdm.write('Run this to test')
+    # if input('Mabite [Y/n]') != 'n':
+    #     for time in toto:
+    #         call("timeout 5 vlc '%s' --start-time=%d" % (filename, time), shell=True)
+    #         sleep(5)
