@@ -1,6 +1,8 @@
 .DS_Store
 *.pyc
 
+cache
+
 # Created by https://www.gitignore.io/api/macos,linux,python,vim,emacs
 
 ### macOS ###
