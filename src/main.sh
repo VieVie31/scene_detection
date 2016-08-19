@@ -79,7 +79,7 @@ done
 cd $CACHE_DIRECTORY
 echo "Concatenate videos"
 #Creating ffmpeg input file for concatenation
-echo -e "${encoded_videos::-1}" | \
+echo -e "${encoded_videos::-2}" | \
   while read tab; do echo "file '$tab'"; done > list.txt
 
 # Encoding
