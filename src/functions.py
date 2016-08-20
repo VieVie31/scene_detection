@@ -219,9 +219,12 @@ def get_hash_of_hashes(L):
     :return: a compressed perceptual hash of a sequence
     :rtype: int
     """
+    print(L)
     L = reduce(lambda a, b: a + b, map(int_to_bits_indexes, L), [])
     c = Counter(L)
     out = 0
+    if c == Counter(): # a fix, because not working if no arg is passed to scd on os x
+        return 0
     med = sum(c.values()) / (max(c) + 1.)
     for k in c:
         if c[k] >= med:
