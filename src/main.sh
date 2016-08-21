@@ -1,5 +1,6 @@
 #! /bin/sh
-
+echo -n "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa - aaaaaaaaaaaaaaaaaaaaaaaaaaaaa" > /cache/test.txt
+cat /cache/test.txt
 # create an id for the video to transform with specified paramters
 function make_id {
   fingerprint=$(echo -e $@ | base64)
@@ -50,6 +51,10 @@ do
   # fi
 
   video_id=$(make_id $f)
+
+  # FIX : Remove white spaces from encoded_videos id
+  video_id="$(echo -e "${video_id}" | tr -d '[[:space:]]')"
+
   echo "$current;$f;$video_id" >> $CACHE_DIRECTORY/indexes.txt
   echo "[$current / $total] $f $video_id"
   # increment file counter
@@ -74,13 +79,13 @@ do
   encoded_videos="$encoded_videos$video_id.mp4\n"
 done
 
-
 # Concatenate all encoded videos
 cd $CACHE_DIRECTORY
 echo "Concatenate videos"
 #Creating ffmpeg input file for concatenation
 echo -e "${encoded_videos::-2}" | \
   while read tab; do echo "file '$tab'"; done > list.txt
+
 
 # Encoding
 yes | ffmpeg \
