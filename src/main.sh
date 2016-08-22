@@ -1,6 +1,5 @@
 #! /bin/sh
-echo -n "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa - aaaaaaaaaaaaaaaaaaaaaaaaaaaaa" > /cache/test.txt
-cat /cache/test.txt
+
 # create an id for the video to transform with specified paramters
 function make_id {
   fingerprint=$(echo -e $@ | base64)
