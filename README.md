@@ -7,7 +7,7 @@ The goal of this project is to provide a simple interface to let people remove g
 
 Presently, we are able to detect commons parts video :beer: ... so, the most important part of the jobs is done.
 
-We have tried with the Shadoks, Kaamelott and other series, and it seems we are on the right track !
+We have tried on several series, and it seems we are on the right track !
 
 - This project is still in development, if you want to help, do not hesitate to fork...
 
