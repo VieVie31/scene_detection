@@ -219,7 +219,6 @@ def get_hash_of_hashes(L):
     :return: a compressed perceptual hash of a sequence
     :rtype: int
     """
-    print(L)
     L = reduce(lambda a, b: a + b, map(int_to_bits_indexes, L), [])
     c = Counter(L)
     out = 0

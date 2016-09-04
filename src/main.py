@@ -14,10 +14,6 @@ from time import sleep
 from base64 import b64decode
 import os
 import warnings
-# Remove matplotlib warning because of fc-cache building
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    import matplotlib.pyplot as plt
 
 def get_metdata(path: str):
     a = ffprobe(path)['video']
@@ -42,6 +38,7 @@ if __name__ == '__main__':
             }]
         ORIGINAL_VIDEOS = [(v['source'], v['encoded']) for v in sorted(ORIGINAL_VIDEOS, key=lambda x: x['index'])]
         print(ORIGINAL_VIDEOS)
+        
     # Temporary arg parsing
     for _, source in zip(trange( \
                             len(argv) - 2, \
@@ -85,13 +82,6 @@ if __name__ == '__main__':
             },
         }]
 
-        # Creating output graph
-        plt.plot(L)
-        plotfile = '/cache/stats/%s.png' % source.split('/')[-1]
-        plt.savefig(plotfile)
-        plt.clf()
-        plt.cla()
-        plt.close()
 
         #trying some stuffs about sequence hashing
         sequences = list(sliding_window(L, SEQUENCE_LENGTH, SLIDING_WINDOW, get_hash_of_hashes))
@@ -101,17 +91,11 @@ if __name__ == '__main__':
 
         best = c.most_common(1)[0][0]
         indexes = [x for x, s in enumerate(sequences) if s == best]
-        tqdm.write('[matchs] %d [indexes] %s' % (
-            c.most_common(1)[0][1],
-            indexes
-        ))
+        #tqdm.write('[matchs] %d [indexes] %s' % (
+        #    c.most_common(1)[0][1],
+        #    indexes
+        #))
 
-        #searching the longuest repeated sub array
-        #<!> this function take a quadratic time ... so can crash computer ?? maybe...
-        #potentiel_generic = longuest_repeated_string(L, lambda a, b: hamming(a, b) < 1)
-        #tqdm.write(pformat(potentiel_generic, indent=2))
-        #tqdm.write(str(len(potentiel_generic)))
-        #tqdm.write(str(get_indexes(L, potentiel_generic, lambda a, b: hamming_match(a, b, 5))))
     tqdm.write(pformat(stats, indent=2, depth=2))
     tqdm.write(pformat(ORIGINAL_VIDEOS, indent=2, depth=2))
     for stat in stats:
@@ -138,10 +122,3 @@ if __name__ == '__main__':
         # If this assertion raise, we were not able to locate match in source videos
         assert found is True
 
-
-
-    # tqdm.write('Run this to test')
-    # if input('Mabite [Y/n]') != 'n':
-    #     for time in toto:
-    #         call("timeout 5 vlc '%s' --start-time=%d" % (filename, time), shell=True)
-    #         sleep(5)
