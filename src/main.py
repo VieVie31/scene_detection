@@ -7,7 +7,8 @@ from collections import Counter
 from functions import phash64, dhash, dhash_freesize, \
                       hamming, longuest_repeated_string, \
                       get_indexes, hamming_match, \
-                      get_hash_of_hashes, sliding_window
+                      get_hash_of_hashes, sliding_window, \
+                      compress_indexes
 from skvideo.io import vreader, ffprobe
 from subprocess import call
 from time import sleep
@@ -102,6 +103,18 @@ if __name__ == '__main__':
         tqdm.write('Frames: %s %s %s' % (stat['frames'], 'TimeBase:', stat['time_base']))
     start_frame = 0
     idx = 0
+
+
+    compressed_indexes = compress_indexes(indexes)
+    # we can choose to take juste the first index matched by sequence
+    # or take the middle sequence index... just a question of POV...
+    #indexes = d.keys() #here we take the first
+    indexes = map(lambda k: int(k + compressed_indexes[k] / 2.),
+                  compressed_indexes.keys()) #here we take the mean
+
+    indexes = sorted(indexes)
+
+    tqdm.write(str(indexes))
 
     for match in indexes:
         found = False

@@ -8,6 +8,34 @@ from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
+def compress_indexes(indexes):
+    """Compress a list of indexes. The list is assumed to be sorted in ascending
+    order, and this function will remove the all the consecutives numbers and
+    only keep the first and the number of the consecutives in a dict.
+
+    eg : [0, 1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 18, 19, 20, 21, 22]
+    become : {0: 5, 18: 5, 7: 7}
+
+    :param indexes: the list of indexes asc sorted to compress
+
+    :type indexes: list of int
+
+    :return: a dict containing the indexes as keys and # of consecutives
+             numbers as value.
+    :rtype: dict
+    """
+    d = {}
+    c = indexes[0]
+    j = 0
+    for i in range(1, len(indexes)):
+        j += 1
+        if c + j != indexes[i]:
+            d[c] = j
+            c = indexes[i]
+            j = 0
+    d[c] = j + 1
+    return d
+
 def get_indexes(lst, sub_lst, compare_function=None):
     """Return the indexes of a sub list in a list.
 
