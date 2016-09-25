@@ -8,7 +8,7 @@ from functions import phash64, dhash, dhash_freesize, \
                       hamming, longuest_repeated_string, \
                       get_indexes, hamming_match, \
                       get_hash_of_hashes, sliding_window, \
-                      compress_indexes
+                      compress_indexes, merge_intervals
 from skvideo.io import vreader, ffprobe
 from subprocess import call
 from time import sleep
@@ -105,17 +105,21 @@ if __name__ == '__main__':
     idx = 0
 
 
-    compressed_indexes = compress_indexes(indexes)
-    # we can choose to take juste the first index matched by sequence
-    # or take the middle sequence index... just a question of POV...
-    #indexes = d.keys() #here we take the first
-    indexes = map(lambda k: int(k + compressed_indexes[k] / 2.),
-                  compressed_indexes.keys()) #here we take the mean
+    ## DEPRECATED
+    ##compressed_indexes = compress_indexes(indexes)
+    ## we can choose to take juste the first index matched by sequence
+    ## or take the middle sequence index... just a question of POV...
+    ##indexes = d.keys() #here we take the first
+    ##indexes = map(lambda k: int(k + compressed_indexes[k] / 2.),
+    ##              compressed_indexes.keys()) #here we take the mean
+    indexes = map(lambda t: (t[0] + t[1]) // 2,
+                  merge_intervals(indexes, SEQUENCE_LENGTH))
 
     indexes = sorted(indexes)
 
     tqdm.write(str(indexes))
-
+    tqdm.write("# matchs : {}".format(len(indexes)))
+    """
     for match in indexes:
         found = False
 
@@ -134,4 +138,4 @@ if __name__ == '__main__':
 
         # If this assertion raise, we were not able to locate match in source videos
         assert found is True
-
+    """

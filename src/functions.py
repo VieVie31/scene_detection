@@ -8,6 +8,33 @@ from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
+
+def merge_intervals(indexes, length):
+    """Merges overlapping intervals of matches for given indexes and generic
+    lzngth. This function assume the indexes are allready sorted in ascending
+    order.
+
+    :param indexes: the list of indexes acs sorted to merge
+    :param length: the length of the generic
+
+    :type indexes: list of int
+    :type length: int
+
+    :return: a list of couples of begining of the interval and the end
+    :rtype: list of list
+    """
+    out = []
+    L = list(map(lambda v: [v, v + length], indexes))
+    tmp = L[0]
+    for (s, e) in L: #allready sorted
+        if s <= tmp[1]:
+            tmp[1] = max(tmp[1], e)
+        else:
+            out.append(tuple(tmp))
+            tmp = [s, e]
+    out.append(tuple(tmp))
+    return out
+
 def compress_indexes(indexes):
     """Compress a list of indexes. The list is assumed to be sorted in ascending
     order, and this function will remove the all the consecutives numbers and
