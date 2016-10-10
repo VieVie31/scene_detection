@@ -1,19 +1,23 @@
-import numpy as np
-import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
-
 import math
 import random
+import numpy as np
+
+import warnings
+#remove matplotlib warning because of fc-cache building
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import matplotlib.mlab as mlab
+    import matplotlib.pyplot as plt
 
 from pprint import pprint
 
-BOUND_MAX = 2**4
+BOUND_MAX = 2**8
 L_LENGTH = 10000
-SL_LENGTH = 5
-NB_INSERT = 6
+SL_LENGTH = 10
+NB_INSERT = 10
 NB_STD = 4
 
-print "generation..."
+print("generation...")
 
 L   = [random.randrange(0, BOUND_MAX) for i in range(L_LENGTH)]  #the long sequence
 SL  = [random.randrange(0, BOUND_MAX) for i in range(SL_LENGTH)] #the shorter sequence
@@ -24,7 +28,7 @@ idx.sort()
 for i in idx:
     L = L[:i] + SL + L[i:]
 
-print "searching..."
+print("searching...")
 
 
 d = {}
@@ -36,8 +40,8 @@ for i in range(len(L) - 2): #-1):#- 2):
         d[tpl] = 1
 
 
-a = np.array(d.values())
-a.sort()
+a = list(sorted(list(d.values())))
+a = np.array(a)
 
 #keep number bigger than 6 standard deviation (cf. anomally detection)
 #keep keys in d that have a counter bigger than NB_STD * std
@@ -81,8 +85,8 @@ L = list(longest[0])
 for t in longest[1:]:
     L.append(t[2])
 
-print L == SL
-print L
-print SL
+print(L == SL)
+print(L)
+print(SL)
 
 
