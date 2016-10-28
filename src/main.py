@@ -8,7 +8,7 @@ from functions import phash64, dhash, dhash_freesize, \
                       hamming, longuest_repeated_string, \
                       get_indexes, hamming_match, \
                       get_hash_of_hashes, sliding_window, \
-                      compress_indexes, merge_intervals
+                      compress_indexes, merge_intervals, mseq
 from skvideo.io import vreader, ffprobe
 from subprocess import call
 from time import sleep
@@ -84,11 +84,31 @@ if __name__ == '__main__':
         }]
 
 
+        #for v in L:
+        #    print(v)
+
+        #f = open("/cache/L.txt", "w")
+        #f.write(str(L))
+        #f.close()
+
+        #try to automatically find a good SEQUENCE_LENGTH
+        s_mseq = mseq(L)
+        h_mseq = get_hash_of_hashes(s_mseq)
+        print("potential sequence of ints representing the generic : ")
+        print(s_mseq)
+        print("correspinding sequence hash :")
+        print(h_mseq)
+        print(h_mseq)
+        print(h_mseq)
+
+        SEQUENCE_LENGTH = len(s_mseq)
+        
         #trying some stuffs about sequence hashing
         sequences = list(sliding_window(L, SEQUENCE_LENGTH, SLIDING_WINDOW, get_hash_of_hashes))
         c = Counter(sequences)
         # tqdm.write(pformat(c, indent=2, depth=2))
 
+        tqdm.write(pformat(c.most_common()[:10]))
 
         best = c.most_common(1)[0][0]
         indexes = [x for x, s in enumerate(sequences) if s == best]

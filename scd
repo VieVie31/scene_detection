@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog="scd", description='Shrink videos to delete openings.')
     parser.add_argument('-f', '--fps', type=int, help='Number of frame per second analysed.', default=5)
     parser.add_argument('-r', '--resolution', type=str, help='Set analysis resolution: widthxheight.', default='8x8')
-    parser.add_argument('-sl', '--sequence-length', type=int, help='Get the hashes of video by sequences of `sl` frames.', default=1)  # TODO : implement
+    parser.add_argument('-sl', '--sequence-length', type=int, help='[DEPRECATED] This param will be ignored. Get the hashes of video by sequences of `sl` frames.', default=1)  # TODO : implement
     parser.add_argument('-sw', '--sliding-window', type=int, help='Set inter sequences hashes step.', default=1)                       # TODO : implement
     parser.add_argument('-nc', '--no-cache', action='store_true', help='Disable application video encoding cache.')
     parser.add_argument('-cc', '--clear-cache', action='store_true', help='Clear all files cached before running the rest of the app.')

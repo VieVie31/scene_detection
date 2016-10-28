@@ -9,6 +9,77 @@ from skimage.color import rgb2grey
 from skimage.transform import resize
 
 
+def mseq(L, nb_std=4):
+    """From a given sequence L, try to find a repeating subtring
+    (appearing the multiple time) wich could be a pattern repeated repeadted
+    not periodocally.
+    This function use stats, per consequenc this not guaranty to find the good
+    pattern, but a possible pattenr.
+
+    :param L: a list where a pattern is hidden
+    :param nb_std: will search a sequence in tri-grams appearing more than nb_std
+
+    :type L: list(int)
+    :type nb_std: int
+
+    :return: the list of ints that could be a pattern
+    :rtype: list(int)
+    """
+    #phase 1 : compute the frequency of appartion fo 3-grams
+    d = {}
+    for i in range(len(L) - 2):
+        tpl = ((L[i], L[i + 1]), L[i + 2])
+        if tpl in d:
+            d[tpl] += 1
+        else:
+            d[tpl] = 1
+    
+    a = list(sorted(list(d.values())))
+    a = np.array(a)
+
+    #keep keys in d that have a counter bigger than nb_std * std
+    dd = {}
+    for k in d:
+        if d[k] >= a.mean() + nb_std * a.std():
+            dd[k] = d[k]
+
+    #remap and keep the keys
+    dd = {(a, b, c) : [] for ((a, b), c) in dd.keys()}
+
+    #create all possibles paths
+    for (a, b, c) in dd:
+        dd[(a, b, c)] = filter(lambda t: (b, c) == (t[0], t[1]), dd.keys())
+
+    #get the longest path without cycle --> should be the SL (or close to, statistically)
+    longest = []
+
+    visited = set()
+    path = []
+    def search(v, d={}):
+        visited.add(v)
+        path.append(v)
+        
+        if len(path) > len(longest):
+            longest[:] = path[:]
+            
+        for w in d[v]:
+            if w not in visited:
+                search(w, d)
+                
+        path.pop()
+        visited.remove(v)
+
+    #try all possibilities
+    for v in dd:
+        search(v, dd)
+
+    #remake the list of longest
+    L = list(longest[0])
+    for t in longest[1:]:
+        L.append(t[2])
+
+    return L
+
 def merge_intervals(indexes, length):
     """Merges overlapping intervals of matches for given indexes and generic
     lzngth. This function assume the indexes are allready sorted in ascending

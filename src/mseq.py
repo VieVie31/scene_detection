@@ -10,23 +10,29 @@ with warnings.catch_warnings():
     import matplotlib.pyplot as plt
 
 from pprint import pprint
+##
+##BOUND_MAX = 2**8
+##L_LENGTH = 10000
+##SL_LENGTH = 10
+##NB_INSERT = 20
+##NB_STD = 4
+##
+##print("generation...")
+##
+##L   = [random.randrange(0, BOUND_MAX) for i in range(L_LENGTH)]  #the long sequence
+##SL  = [random.randrange(0, BOUND_MAX) for i in range(SL_LENGTH)] #the shorter sequence
+##idx = [random.randrange(0, L_LENGTH) for i in range(NB_INSERT)]  #index in the lonsequence to appen the shorter
+##idx.sort()
+##
+##
+##for i in idx:
+##    L = L[:i] + SL + L[i:]
 
-BOUND_MAX = 2**8
-L_LENGTH = 10000
-SL_LENGTH = 10
-NB_INSERT = 10
 NB_STD = 4
 
-print("generation...")
-
-L   = [random.randrange(0, BOUND_MAX) for i in range(L_LENGTH)]  #the long sequence
-SL  = [random.randrange(0, BOUND_MAX) for i in range(SL_LENGTH)] #the shorter sequence
-idx = [random.randrange(0, L_LENGTH) for i in range(NB_INSERT)]  #index in the lonsequence to appen the shorter
-idx.sort()
-
-
-for i in idx:
-    L = L[:i] + SL + L[i:]
+f = open("/Users/mac/Desktop/scene_detection/cache/L.txt", 'r')
+L = eval(f.read())
+f.close()
 
 print("searching...")
 
@@ -85,8 +91,8 @@ L = list(longest[0])
 for t in longest[1:]:
     L.append(t[2])
 
-print(L == SL)
+#print(L == SL)
 print(L)
-print(SL)
+#print(SL)
 
 
