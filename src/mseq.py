@@ -36,6 +36,9 @@ f.close()
 
 print("searching...")
 
+print(len(L))
+
+NB_STD = 4
 
 d = {}
 for i in range(len(L) - 2): #-1):#- 2):
@@ -48,6 +51,7 @@ for i in range(len(L) - 2): #-1):#- 2):
 
 a = list(sorted(list(d.values())))
 a = np.array(a)
+
 
 #keep number bigger than 6 standard deviation (cf. anomally detection)
 #keep keys in d that have a counter bigger than NB_STD * std

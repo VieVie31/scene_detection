@@ -26,7 +26,7 @@ def mseq(L, nb_std=4):
     :rtype: list(int)
     """
     #phase 1 : compute the frequency of appartion fo 3-grams
-    d = {}
+    d = {} 
     for i in range(len(L) - 2):
         tpl = ((L[i], L[i + 1]), L[i + 2])
         if tpl in d:

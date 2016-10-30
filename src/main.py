@@ -87,9 +87,9 @@ if __name__ == '__main__':
         #for v in L:
         #    print(v)
 
-        #f = open("/cache/L.txt", "w")
-        #f.write(str(L))
-        #f.close()
+        f = open("/cache/L.txt", "w")
+        f.write(str(L))
+        f.close()
 
         #try to automatically find a good SEQUENCE_LENGTH
         s_mseq = mseq(L)

@@ -26,7 +26,7 @@ def fps_parser(v):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog="scd", description='Shrink videos to delete openings.')
-    parser.add_argument('-f', '--fps', type=int, help='Number of frame per second analysed.', default=5)
+    parser.add_argument('-f', '--fps', type=int, help='Number of frame per second analysed.', default=1)
     parser.add_argument('-r', '--resolution', type=str, help='Set analysis resolution: widthxheight.', default='8x8')
     parser.add_argument('-sl', '--sequence-length', type=int, help='[DEPRECATED] This param will be ignored. Get the hashes of video by sequences of `sl` frames.', default=1)  # TODO : implement
     parser.add_argument('-sw', '--sliding-window', type=int, help='Set inter sequences hashes step.', default=1)                       # TODO : implement
