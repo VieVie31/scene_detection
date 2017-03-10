@@ -9,30 +9,54 @@ with warnings.catch_warnings():
     import matplotlib.mlab as mlab
     import matplotlib.pyplot as plt
 
+from collections import Counter
 from pprint import pprint
-##
-##BOUND_MAX = 2**8
-##L_LENGTH = 10000
-##SL_LENGTH = 10
-##NB_INSERT = 20
-##NB_STD = 4
-##
-##print("generation...")
-##
-##L   = [random.randrange(0, BOUND_MAX) for i in range(L_LENGTH)]  #the long sequence
-##SL  = [random.randrange(0, BOUND_MAX) for i in range(SL_LENGTH)] #the shorter sequence
-##idx = [random.randrange(0, L_LENGTH) for i in range(NB_INSERT)]  #index in the lonsequence to appen the shorter
-##idx.sort()
-##
-##
-##for i in idx:
-##    L = L[:i] + SL + L[i:]
+
+#importing my set of functions
+from functions import *
+
+
+BOUND_MAX = 2**8
+L_LENGTH = 10000
+SL_LENGTH = 10
+NB_INSERT = 20
+NB_STD = 4
+
+print("generation...")
+
+L   = [random.randrange(0, BOUND_MAX) for i in range(L_LENGTH)]  #the long sequence
+SL  = [random.randrange(0, BOUND_MAX) for i in range(SL_LENGTH)] #the shorter sequence
+idx = [random.randrange(0, L_LENGTH) for i in range(NB_INSERT)]  #index in the lonsequence to appen the shorter
+idx.sort()
+
+
+for i in idx:
+    L = L[:i] + SL + L[i:]
 
 NB_STD = 4
 
-f = open("/Users/mac/Desktop/scene_detection/cache/L.txt", 'r')
-L = eval(f.read())
-f.close()
+##f = open("/Users/mac/Desktop/scene_detection/cache/L.txt", 'r')
+##L = eval(f.read())
+##f.close()
+
+################################
+# THE COMPRESSION LZW APPROACH #
+################################
+
+def index_of_sublist_in_list(lst, sub_lst):
+    for i in range(len(lst) - len(sub_lst)):
+        if lst[i:i+len(sub_lst)] == sub_lst:
+            return i
+    raise ValueError("Sub list not found !! :'(")
+
+reconstitued_sequence = cseq(L)
+
+print(reconstitued_sequence)
+print("found exactly the same sequence : ", reconstitued_sequence == SL)
+
+############################
+# THE STATISTICAL APPROCAH #
+############################
 
 print("searching...")
 

@@ -9,12 +9,117 @@ from skimage.color import rgb2grey
 from skimage.transform import resize
 
 
+def get_LZW_dictionnary(L):
+    """This slightly modified version of the LZW compression algorithm return
+    a dictionnay of sequences encountered in L with their count of occurence.
+
+    :param L: a list where a pattern is hidden
+
+    :type L: list(int)
+
+    :return: the dictionnary of patterns with their count of occurence
+    :rtype: dict{tuple: int}
+    """
+    w, d, L = [], {}, L[:]
+    while L:
+        c = L.pop()
+        if tuple(w + [c]) in d:
+            w.append(c)
+            d[tuple(w)] += 1
+        else:
+            d[tuple(w + [c])] = 1
+            w = [c]
+    return d
+
+def most_common_used_element(L):
+    """From a giver sequence L, return the most common used element with
+    it percentage of use. If there is more than one most commin used element,
+    only one of them will be returned.
+
+    :param L: a list of elements
+
+    :type L: list(int)
+
+    :return: a couple, the most common used element in the list and its 
+    percentage of use.
+    :rtype: tuple(int, float)
+    """
+    v = max(set(L), key=L.count)
+    return v, L.count(v) / float(len(L))
+
+def trim_the_firsts_e(L, e):
+    """Return the list L without the first sequence of element(s) e.
+    Eg. trim_the_firsts_e([0, 0, 1, 0, 1, 0]) -> [1, 0, 1, 0]
+
+    :param L: the list to trim
+    :param e: the element to remove
+
+    :type L: list(int)
+    :type e: int
+
+    :return: the list L without the first(s) e(s)
+    :rtype: list(int)
+    """
+    L = L[:] #do not destroy the original list...
+    while L and L[0] == e:
+        L.pop(0)
+    return L
+
+def trim_the_lasts_e(L, e):
+    """Return the list L without the last sequence of element(s) e.
+    Eg. trim_the_lasts_e([0, 0, 1, 0, 1, 0]) -> [0, 0, 1, 0, 1]
+
+    :param L: the list to trim
+    :param e: the element to remove
+
+    :type L: list(int)
+    :type e: int
+
+    :return: the list L without the first(s) e(s)
+    :rtype: list(int)
+    """
+    L = L[:] #do not destroy the original list...
+    while L and L[-1] == e:
+        L.pop()
+    return L
+
+def cseq(L): #cseq: c because the seq comes from a compressed algo
+    """From a given sequence L, try to find a repeating substring
+    (appearing the multiple time) wich could be a pattern repeated repeadted
+    not necessarily periodocally.
+    This function use a modified version of the LZW compression algorithm,
+    per consequenc this not guaranty to find the good and longest pattern,
+    but a possible pattern.
+
+    :param L: a list where a pattern is hidden 
+
+    :type L: list(int)
+
+    :return: the list of ints that could be a pattern 
+    :rtype: list(int)
+    """
+    d = get_LZW_dictionnary(L[:])
+    sequences_length = Counter(map(len, d.keys()))
+    max_sequence_length = max(sequences_length.keys()) 
+    longuest_sequences = filter(lambda k: len(k) == max_sequence_length, d.keys())
+    weighted_most_common_seq = map(most_common_used_element, zip(*longuest_sequences))
+    #the minimal percentage of apparition of the element to be counted as usefull
+    MIN_PERCENT_SCORE = .5 
+    reconstitued_sequence = map(
+            lambda c: c[0] if c[1] > MIN_PERCENT_SCORE else None,
+            weighted_most_common_seq)
+    reconstitued_sequence = list(reconstitued_sequence)
+    reconstitued_sequence = trim_the_firsts_e(reconstitued_sequence, None)
+    reconstitued_sequence = trim_the_lasts_e(reconstitued_sequence,  None)
+    reconstitued_sequence = reconstitued_sequence[::-1] 
+    return reconstitued_sequence
+
 def mseq(L, nb_std=4):
     """From a given sequence L, try to find a repeating subtring
     (appearing the multiple time) wich could be a pattern repeated repeadted
-    not periodocally.
+    not necessarily periodocally.
     This function use stats, per consequenc this not guaranty to find the good
-    pattern, but a possible pattenr.
+    pattern, but a possible pattern.
 
     :param L: a list where a pattern is hidden
     :param nb_std: will search a sequence in tri-grams appearing more than nb_std
