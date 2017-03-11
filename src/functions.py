@@ -106,11 +106,11 @@ def cseq(L): #cseq: c because the seq comes from a compressed algo
     #the minimal percentage of apparition of the element to be counted as usefull
     MIN_PERCENT_SCORE = .5 
     reconstitued_sequence = map(
-            lambda c: c[0] if c[1] > MIN_PERCENT_SCORE else None,
+            lambda c: c[0] if c[1] > MIN_PERCENT_SCORE else 0,
             weighted_most_common_seq)
     reconstitued_sequence = list(reconstitued_sequence)
-    reconstitued_sequence = trim_the_firsts_e(reconstitued_sequence, None)
-    reconstitued_sequence = trim_the_lasts_e(reconstitued_sequence,  None)
+    reconstitued_sequence = trim_the_firsts_e(reconstitued_sequence, 0)
+    reconstitued_sequence = trim_the_lasts_e(reconstitued_sequence,  0)
     reconstitued_sequence = reconstitued_sequence[::-1] 
     return reconstitued_sequence
 
