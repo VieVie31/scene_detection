@@ -19,7 +19,7 @@ from functions import *
 BOUND_MAX = 2**8
 L_LENGTH = 10000
 SL_LENGTH = 10
-NB_INSERT = 20
+NB_INSERT = 12
 NB_STD = 4
 
 print("generation...")
@@ -39,6 +39,13 @@ NB_STD = 4
 ##L = eval(f.read())
 ##f.close()
 
+print("sequence solution : ", end='')
+print(SL)
+print("sequence hash of hashes : ", end='')
+h_o_h = get_hash_of_hashes(SL)
+print(h_o_h)
+
+
 ################################
 # THE COMPRESSION LZW APPROACH #
 ################################
@@ -50,8 +57,14 @@ def index_of_sublist_in_list(lst, sub_lst):
     raise ValueError("Sub list not found !! :'(")
 
 reconstitued_sequence = cseq(L)
-
+ 
+print("LZW approcah...")
 print(reconstitued_sequence)
+h_o_lzw = get_hash_of_hashes(reconstitued_sequence)
+print("hash of hahses : ", end='')
+print(h_o_lzw)
+print("hamming distance between hashes : ", end='')
+print(hamming(h_o_h, h_o_lzw))
 print("found exactly the same sequence : ", reconstitued_sequence == SL)
 
 ############################
@@ -119,8 +132,14 @@ L = list(longest[0])
 for t in longest[1:]:
     L.append(t[2])
 
+print("statistical approach...")
+print("reconstructed sequence : ", end='')
 #print(L == SL)
 print(L)
 #print(SL)
 
-
+h_o_s = get_hash_of_hashes(L)
+print("reconstitued sequence hash of hashes : ", end='')
+print(h_o_s)
+print("distance between hashes : ", end='')
+print(hamming(h_o_h, h_o_s))
