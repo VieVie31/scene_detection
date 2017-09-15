@@ -41,7 +41,8 @@ RUN pip3 install --upgrade --no-cache-dir \
         pep8 \
         tqdm \
         matplotlib \
-        scikit-image
+        scikit-image \
+        sklearn
 
 WORKDIR /src/
 CMD bash main.sh
