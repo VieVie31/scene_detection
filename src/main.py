@@ -8,12 +8,13 @@ from functions import phash64, dhash, dhash_freesize, \
                       hamming, longuest_repeated_string, \
                       get_indexes, hamming_match, \
                       get_hash_of_hashes, sliding_window, \
-                      compress_indexes, merge_intervals, mseq, \
+                      compress_indexes, merge_intervals, mseq, cseq, \
                       get_scenes_segmentation
 from skvideo.io import vreader, ffprobe
 from subprocess import call
 from time import sleep
 from base64 import b64decode
+from sklearn.cluster import KMeans
 import os
 import warnings
 import numpy as np
@@ -82,8 +83,23 @@ if __name__ == '__main__':
 
         #TODO: make clustering to find clusters with the greatest density
         #those could be the generics and redundant parts...        
-        
+        kmean = KMeans(n_clusters=len(scenes_hashes_vector) // int(np.log(len(scenes_hashes_vector))))
+        scenes_clusters = kmean.fit_predict(scenes_hashes_vector)
+        scenes_clusters_freq = Counter(scenes_clusters)
+        scene_freq = np.array(list(scenes_clusters_freq.values()))
+        min_scene_freq = scene_freq.mean() + scene_freq.std() * 3
+        redundant_scenes_clusters_id = list(filter(
+            lambda k: scenes_clusters_freq[k] >= min_scene_freq,
+            scenes_clusters_freq.keys()
+        ))
+        redudant_scenes = set([i if w else -1 for i, w in enumerate(map(lambda v: v in redundant_scenes_clusters_id, scenes_clusters))])
+        redudant_scenes.remove(-1)
+        redudant_scenes = sorted(list(redudant_scenes))
+        print(len(redudant_scenes))
 
+        for rs in redudant_scenes:
+            print(scenes[rs])
+        
         count_tab = Counter(L)
         collisions = sum(count_tab.values()) - len(count_tab)
         assert len(L) == VIDEO_FRAMES_COUNT
