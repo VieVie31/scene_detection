@@ -8,6 +8,31 @@ from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
+def get_scenes_segmentation(diffs, nb_std_above_mean_th=1.):
+    """This function return the a list of potential scene chament segmentation using perceptual hash function.
+    
+    :param diffs: the list of diffs between hashed frames (in grayscale) of the video to segment and it's previous frame
+    :param nb_std_above_mean_th: number of std above the mean of differences between frame to set a segmentation threshold    
+    :type diffs: list(int)
+    :type nb_std_above_mean_th: float
+    
+    :return: the list of indexes of begining / ending sequences...
+    :rtype: list(tupple)
+    """
+    diffs = np.array(diffs)
+    
+    scene_change_threshold = diffs.mean() + diffs.std() * nb_std_above_mean_th
+    
+    #make the scene segmentation
+    scenes = []
+    changes = diffs > scene_change_threshold
+    sequence_begining = 0
+    for i in range(len(changes)):
+        if changes[i]:
+            scenes.append((sequence_begining, i))
+            sequence_begining = i
+    
+    return scenes
 
 def get_LZW_dictionnary(L):
     """This slightly modified version of the LZW compression algorithm return
