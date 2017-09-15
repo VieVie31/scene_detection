@@ -1,5 +1,5 @@
 from sys import argv, exit
-from pprint import pformat
+from pprint import pformat, pprint
 from os.path import abspath
 from tqdm import tqdm, trange
 from itertools import combinations
@@ -8,13 +8,15 @@ from functions import phash64, dhash, dhash_freesize, \
                       hamming, longuest_repeated_string, \
                       get_indexes, hamming_match, \
                       get_hash_of_hashes, sliding_window, \
-                      compress_indexes, merge_intervals, mseq
+                      compress_indexes, merge_intervals, mseq, \
+                      get_scenes_segmentation
 from skvideo.io import vreader, ffprobe
 from subprocess import call
 from time import sleep
 from base64 import b64decode
 import os
 import warnings
+import numpy as np
 
 def get_metdata(path: str):
     a = ffprobe(path)['video']
@@ -68,6 +70,19 @@ if __name__ == '__main__':
             if len(L):
                 diffs.append(hamming(hash_img, L[-1]))
             L.append(hash_img)
+
+        # Get scene segmentation and their hash
+        scenes = get_scenes_segmentation(diffs, nb_std_above_mean_th=2.5)
+        scenes_hashes = [get_hash_of_hashes(L[s:e]) for s, e in scenes]
+        scenes_hashes_vector = list(map(lambda k: list(map(int, list(bin(k)[2:]))), scenes_hashes))
+        scenes_hashes_vector = list(map(lambda v: [0] * (64 - len(v)) + v, scenes_hashes_vector)) # 0 padding to get the same length
+        scenes_hashes_vector = np.array(scenes_hashes_vector)
+        
+        tqdm.write(pformat(Counter(scenes_hashes)))
+
+        #TODO: make clustering to find clusters with the greatest density
+        #those could be the generics and redundant parts...        
+        
 
         count_tab = Counter(L)
         collisions = sum(count_tab.values()) - len(count_tab)
@@ -139,7 +154,7 @@ if __name__ == '__main__':
 
     tqdm.write(str(indexes))
     tqdm.write("# matchs : {}".format(len(indexes)))
-    """
+    #"""
     for match in indexes:
         found = False
 
@@ -158,4 +173,4 @@ if __name__ == '__main__':
 
         # If this assertion raise, we were not able to locate match in source videos
         assert found is True
-    """
+    #"""
