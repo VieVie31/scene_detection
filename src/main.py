@@ -9,12 +9,12 @@ from functions import phash64, dhash, dhash_freesize, \
                       get_indexes, hamming_match, \
                       get_hash_of_hashes, sliding_window, \
                       compress_indexes, merge_intervals, mseq, cseq, \
-                      get_scenes_segmentation
+                      get_scenes_segmentation, get_joly_scenes_sementation
 from skvideo.io import vreader, ffprobe
 from subprocess import call
 from time import sleep
 from base64 import b64decode
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MeanShift, AffinityPropagation
 import os
 import warnings
 import numpy as np
@@ -64,6 +64,7 @@ if __name__ == '__main__':
 
         L = []
         diffs = [0]
+        frames = []
 
         # Hashing
         for _, frame in zip(trange(VIDEO_FRAMES_COUNT, leave=False), cap):
@@ -71,16 +72,47 @@ if __name__ == '__main__':
             if len(L):
                 diffs.append(hamming(hash_img, L[-1]))
             L.append(hash_img)
+            frames.append(frame)
 
         # Get scene segmentation and their hash
-        scenes = get_scenes_segmentation(diffs, nb_std_above_mean_th=2.5)
+        scenes = get_joly_scenes_sementation(frames, nb_std_above_mean_th=2.)#get_scenes_segmentation(diffs, nb_std_above_mean_th=2.5)
+        del frames #not take to much memory too long for nothing...
         scenes_hashes = [get_hash_of_hashes(L[s:e]) for s, e in scenes]
+        
+        #tqdm.write(pformat(Counter(scenes_hashes)))
+
+        distance_matrix = np.zeros([len(scenes_hashes)] * 2)
+        #compute distance between scenes' hashes
+        for i in trange(len(scenes_hashes)):
+            for j in range(len(scenes_hashes)):
+                distance_matrix[i, j] = hamming(scenes_hashes[i], scenes_hashes[j])
+        #find similar scenes which have hases distance too close compared to others
+        similar_scenes_matrix = distance_matrix < 64 - (distance_matrix.mean() + distance_matrix.std() * 3)
+        #try to automatically found clusters with affinity propagation
+        ap = AffinityPropagation()
+        scenes_clusters = ap.fit_predict(similar_scenes_matrix)
+        #find the clusters with 'too much' points inside compared to others
+        clusters_counter = Counter(scenes_clusters)
+        clusters_freq = np.array(list(clusters_counter.values()))
+        clusters_freq_th = clusters_freq.mean() + clusters_freq.std() * 2.5
+        frequent_clusters_id = list(filter(lambda k: clusters_counter[k] > clusters_freq_th, clusters_counter))
+        #find hashes corresponding to these clusters
+        scenes_hashes_idx = np.array(list(map(lambda v: v in frequent_clusters_id, scenes_clusters)))
+        generics_scenes_hashes = np.array(scenes_hashes, dtype=np.uint64)[scenes_hashes_idx]
+        #get the generics indexes from the scene hashes
+        generics_scenes_idx = []
+        for i, h in enumerate(scenes_hashes):
+            if h in generics_scenes_hashes:
+                generics_scenes_idx.append(i)
+        #get the boundaries of gnerics scenes
+        generics_scenes = list(map(lambda i: scenes[i], generics_scenes_idx))
+
+        tqdm.write(str(len(generics_scenes)))
+        tqdm.write(pformat(list(generics_scenes)))
+
         scenes_hashes_vector = list(map(lambda k: list(map(int, list(bin(k)[2:]))), scenes_hashes))
         scenes_hashes_vector = list(map(lambda v: [0] * (64 - len(v)) + v, scenes_hashes_vector)) # 0 padding to get the same length
         scenes_hashes_vector = np.array(scenes_hashes_vector)
-        
-        tqdm.write(pformat(Counter(scenes_hashes)))
-
         #TODO: make clustering to find clusters with the greatest density
         #those could be the generics and redundant parts...        
         kmean = KMeans(n_clusters=len(scenes_hashes_vector) // int(np.log(len(scenes_hashes_vector))))
@@ -93,7 +125,10 @@ if __name__ == '__main__':
             scenes_clusters_freq.keys()
         ))
         redudant_scenes = set([i if w else -1 for i, w in enumerate(map(lambda v: v in redundant_scenes_clusters_id, scenes_clusters))])
-        redudant_scenes.remove(-1)
+        try:
+            redudant_scenes.remove(-1)
+        except:
+            pass
         redudant_scenes = sorted(list(redudant_scenes))
         print(len(redudant_scenes))
 
@@ -167,6 +202,10 @@ if __name__ == '__main__':
                   merge_intervals(indexes, SEQUENCE_LENGTH))
 
     indexes = sorted(indexes)
+
+    ###########
+    indexes = np.array(generics_scenes).T[0]
+    ###########
 
     tqdm.write(str(indexes))
     tqdm.write("# matchs : {}".format(len(indexes)))
