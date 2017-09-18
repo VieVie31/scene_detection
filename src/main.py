@@ -107,6 +107,15 @@ if __name__ == '__main__':
         #get the boundaries of gnerics scenes
         generics_scenes = list(map(lambda i: scenes[i], generics_scenes_idx))
 
+        generics_sequences = [generics_scenes[0]]
+        for a, b in generics_scenes:
+            if a == generics_sequences[-1][-1]:
+                generics_sequences[-1][-1] = b
+            else:
+                generics_sequences.append([a, b])
+        generics_sequences = sorted(list(set(list(map(tuple, generics_sequences)))))
+        
+
         tqdm.write(str(len(generics_scenes)))
         #tqdm.write(pformat(list(generics_scenes)))
         
@@ -124,9 +133,6 @@ if __name__ == '__main__':
             },
         }]
 
-
-        #for v in L:
-        #    print(v)
 
         f = open("/cache/L.txt", "w")
         f.write(str(L))
@@ -179,7 +185,7 @@ if __name__ == '__main__':
     indexes = sorted(indexes)
 
     ###########
-    indexes = np.array(generics_scenes).T[0]
+    indexes = np.array(generics_sequences).T[0]
     ###########
     
     tqdm.write(str(indexes))
