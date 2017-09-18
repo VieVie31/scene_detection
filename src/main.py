@@ -108,32 +108,7 @@ if __name__ == '__main__':
         generics_scenes = list(map(lambda i: scenes[i], generics_scenes_idx))
 
         tqdm.write(str(len(generics_scenes)))
-        tqdm.write(pformat(list(generics_scenes)))
-
-        scenes_hashes_vector = list(map(lambda k: list(map(int, list(bin(k)[2:]))), scenes_hashes))
-        scenes_hashes_vector = list(map(lambda v: [0] * (64 - len(v)) + v, scenes_hashes_vector)) # 0 padding to get the same length
-        scenes_hashes_vector = np.array(scenes_hashes_vector)
-        #TODO: make clustering to find clusters with the greatest density
-        #those could be the generics and redundant parts...        
-        kmean = KMeans(n_clusters=len(scenes_hashes_vector) // int(np.log(len(scenes_hashes_vector))))
-        scenes_clusters = kmean.fit_predict(scenes_hashes_vector)
-        scenes_clusters_freq = Counter(scenes_clusters)
-        scene_freq = np.array(list(scenes_clusters_freq.values()))
-        min_scene_freq = scene_freq.mean() + scene_freq.std() * 3
-        redundant_scenes_clusters_id = list(filter(
-            lambda k: scenes_clusters_freq[k] >= min_scene_freq,
-            scenes_clusters_freq.keys()
-        ))
-        redudant_scenes = set([i if w else -1 for i, w in enumerate(map(lambda v: v in redundant_scenes_clusters_id, scenes_clusters))])
-        try:
-            redudant_scenes.remove(-1)
-        except:
-            pass
-        redudant_scenes = sorted(list(redudant_scenes))
-        print(len(redudant_scenes))
-
-        for rs in redudant_scenes:
-            print(scenes[rs])
+        #tqdm.write(pformat(list(generics_scenes)))
         
         count_tab = Counter(L)
         collisions = sum(count_tab.values()) - len(count_tab)
