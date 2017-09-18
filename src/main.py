@@ -89,8 +89,8 @@ if __name__ == '__main__':
         #find similar scenes which have hases distance too close compared to others
         similar_scenes_matrix = distance_matrix < 64 - (distance_matrix.mean() + distance_matrix.std() * 3)
         #try to automatically found clusters with affinity propagation
-        ap = AffinityPropagation()
-        scenes_clusters = ap.fit_predict(similar_scenes_matrix)
+        cluster_builder = MeanShift(bandwidth=1)
+        scenes_clusters = cluster_builder.fit_predict(similar_scenes_matrix)
         #find the clusters with 'too much' points inside compared to others
         clusters_counter = Counter(scenes_clusters)
         clusters_freq = np.array(list(clusters_counter.values()))
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     ###########
     indexes = np.array(generics_scenes).T[0]
     ###########
-
+    
     tqdm.write(str(indexes))
     tqdm.write("# matchs : {}".format(len(indexes)))
     #"""
