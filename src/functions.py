@@ -8,6 +8,31 @@ from collections import Counter
 from skimage.color import rgb2grey
 from skimage.transform import resize
 
+def bollinger(L, lag=5, th=2):
+    """This function return a list of boolean with True
+    when a peack is detected False otherwithe.
+    The pick detection works by setting a thresthold of 'th' std
+    on the moving average of the signal with the last 'lag' values.
+
+    :param L: the unidimentionnal signal where to find peaks
+    :param lag: the size of the window for the moving average
+    :param th: the threshold number of std above the std to detect peaks
+
+    :type L: np.array(np.dtype=float)
+    :type lag: int
+    :type th: float (> 0)
+
+    :return: a generator yielding for each value of the signal L a boolean
+    :rtype: generator(list(bool))
+    """
+    LL = L[:lag]
+    for i in range(lag):
+        yield False
+    for i in range(lag, len(L)):
+        yield LL.mean() + th * LL.std() < L[i]
+        LL = L[i:i+lag]
+    return LL.mean() + th * LL.std() < L[i]
+
 def get_joly_scenes_sementation(imgs, nb_std_above_mean_th=5.):
     """This function return the a list of potential scene chament segmentation without perceptual hash function.
     
@@ -36,7 +61,7 @@ def get_joly_scenes_sementation(imgs, nb_std_above_mean_th=5.):
     
     #make the scene segmentation
     scenes = []
-    changes = diffs > scene_change_threshold
+    changes = diffs > scene_change_threshold #list(bollinger(diffs, lag=5, th=nb_std_above_mean_th)) 
     sequence_begining = 0
     for i in range(len(changes)):
         if changes[i]:
